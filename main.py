@@ -1,7 +1,9 @@
 from __future__ import print_function
 from ortools.algorithms import pywrapknapsack_solver
 import numpy as np
+import csv
 from termcolor import colored
+
 
 # Evaluo cord cutting http://www.ebizlatam.com/7-millones-nuevos-usuarios-internet-los-proximos-4-anos-argentina/
 # Latinoamerica 12,9 exabytes/mes
@@ -17,7 +19,7 @@ TIEMPO = MINUTES * SECONDS * AVERAGE_INTERNET_USAGE * DAYS
 AUMENTO_COVID = 1.32
 # Consumo promedio
 CONSUMO_PROMEDIO_MBS = 17.8   # 17.8 Mbps de banca anda fija
-
+ARGENTINA_POPULATION =  7511371 # Cantidad de accessos fijos https://www.cabase.org.ar/wp-content/uploads/2019/12/CABASE-Internet-Index-II-Semestre-2019.pdf
 # 1TB  por mes. Son 1024 MB * 250
 # Relacion 1 Mgbs = 0,125 Mb
 
@@ -29,22 +31,46 @@ MBS_DATA = MB_DATA * 8
 # 320 GB *  1024 Mb * 0,125 Mbs/Mb 2560000
 CAP_MAX =  MBS_DATA # Data cap o sea tasa de transferencia de datos mensual 28Tbps Maximum Throughput
 
+# Create the solver.
+solver = pywrapknapsack_solver.KnapsackSolver(
+    pywrapknapsack_solver.KnapsackSolver.
+    KNAPSACK_MULTIDIMENSION_BRANCH_AND_BOUND_SOLVER, 'KnapsackExample')
 def main():
 
-    # Create the solver.
-    solver = pywrapknapsack_solver.KnapsackSolver(
-        pywrapknapsack_solver.KnapsackSolver.
-        KNAPSACK_MULTIDIMENSION_BRANCH_AND_BOUND_SOLVER, 'KnapsackExample')
+    with open('fix_access_by_province.csv', 'r') as file:
+        reader = csv.reader(file)
+        # Iterates through provinces
+        csv_headings = next(reader)
+        for row in reader:
 
+            # 1.2000000000000002
+            CANTIDAD_ACESOS_FIJOS = int(row[1].replace(",", ""))
+            print(CANTIDAD_ACESOS_FIJOS)
+            CONSUMO_PROMEDIO_MBS_PROV = (CONSUMO_PROMEDIO_MBS * CANTIDAD_ACESOS_FIJOS) / ARGENTINA_POPULATION
+            CAP_MAX_PROV = (CAP_MAX * CANTIDAD_ACESOS_FIJOS) / ARGENTINA_POPULATION
+
+            print ("En Provincia ==", row[0])
+            calculo(CONSUMO_PROMEDIO_MBS_PROV, CAP_MAX_PROV)
+    print()
+    print ("Para todo el pais ")
+    calculo(CONSUMO_PROMEDIO_MBS,CAP_MAX)
+
+def calculo(CONSUMO_PROMEDIO_MBS_PROV, CAP_MAX_PROV):
     maximo_funcional = -1
     maximo_aumento_permitido = 0
-# 1.2000000000000002
+
+    print()
+    print ("Consumo de ", CONSUMO_PROMEDIO_MBS_PROV)
+    print (f"Capacidad maxima por mes de {CAP_MAX_PROV} GB/mes")
+    i = 1
+    print()
+    # for i in np.arange(0, AUMENTO_COVID, 1):
     for i in np.arange(0, AUMENTO_COVID + 0.01, 0.01):
-        print ('Rango -->', i)
-        CONSUMO_MES_TOTAL = TIEMPO * CONSUMO_PROMEDIO_MBS * i#
-        print ('Consumo del mes (MB) es', CONSUMO_MES_TOTAL , " Mb/mes")
-        print ('Consumo del mes (GB) es', CONSUMO_MES_TOTAL / 1024 , " Gb/mes")
-        print ('Capacidad maxima permitida (data cap)', CAP_MAX , " Mb/mes")
+        # print ('Rango -->', i)
+        CONSUMO_MES_TOTAL = TIEMPO * CONSUMO_PROMEDIO_MBS_PROV * i#
+        # print ('Consumo del mes (MB) es', CONSUMO_MES_TOTAL , " Mb/mes")
+        # print ('Consumo del mes (GB) es', CONSUMO_MES_TOTAL / 1024 , " Gb/mes")
+        # print ('Capacidad maxima permitida (data cap)', CAP_MAX , " Mb/mes")
 
 
         PORC_VIDEO_STREAMING = 0.6
@@ -96,32 +122,34 @@ def main():
         ]]
 
 
-        capacities = [CAP_MAX]
+        capacities = [CAP_MAX_PROV]
 
         solver.Init(values, weights, capacities)
         computed_value = solver.Solve()
 
         if (maximo_funcional < computed_value) :
-            print(colored(f"Funcional actual: {computed_value}\n", 'green'), 
-                colored(f"Funcional máximo : {maximo_funcional}", 'red'))
+            # print(colored(f"Funcional actual: {computed_value}\n", 'green'), 
+            #     colored(f"Funcional máximo : {maximo_funcional}", 'red'))
             maximo_funcional = computed_value
             maximo_aumento_permitido = i 
 
         packed_items = []
         packed_weights = []
         total_weight = 0
-        print ('AUMENTO_COVID: ', i)
-        print('Total value =', computed_value)
+        # print ('AUMENTO_COVID: ', i)
+        # print('Total value =', computed_value)
         for i in range(len(values)):
             if solver.BestSolutionContains(i):
                 packed_items.append(i)
                 packed_weights.append(weights[0][i])
                 total_weight += weights[0][i]
-        print('Total weight:', total_weight)
-        print('Packed items:', packed_items)
-        print('Packed_weights:', packed_weights)
-
+        # print('Total weight:', total_weight)
+        # print('Packed items:', packed_items)
+        # print('Packed_weights:', packed_weights)
     print ('Maximo aumento trafico internet permitido:', maximo_aumento_permitido)
+    print('Total weight:', total_weight)
+    print('Packed items:', packed_items)
+    print('Packed_weights:', packed_weights)            
 
 if __name__ == '__main__':
     main()
