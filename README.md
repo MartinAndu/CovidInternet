@@ -17,3 +17,4 @@
     pip install --upgrade --user ortools
     pip install colored
     pip install termcolor
+    pip install pandas

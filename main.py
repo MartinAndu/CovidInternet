@@ -1,7 +1,7 @@
 from __future__ import print_function
 from ortools.algorithms import pywrapknapsack_solver
 import numpy as np
-import csv
+import csvGlobals
 from termcolor import colored
 
 
@@ -35,25 +35,31 @@ CAP_MAX =  MBS_DATA # Data cap o sea tasa de transferencia de datos mensual 28Tb
 solver = pywrapknapsack_solver.KnapsackSolver(
     pywrapknapsack_solver.KnapsackSolver.
     KNAPSACK_MULTIDIMENSION_BRANCH_AND_BOUND_SOLVER, 'KnapsackExample')
+
+
 def main():
 
-    with open('fix_access_by_province.csv', 'r') as file:
-        reader = csv.reader(file)
-        # Iterates through provinces
-        csv_headings = next(reader)
-        for row in reader:
-
-            # 1.2000000000000002
-            CANTIDAD_ACESOS_FIJOS = int(row[1].replace(",", ""))
-            print(CANTIDAD_ACESOS_FIJOS)
-            CONSUMO_PROMEDIO_MBS_PROV = (CONSUMO_PROMEDIO_MBS * CANTIDAD_ACESOS_FIJOS) / ARGENTINA_POPULATION
-            CAP_MAX_PROV = (CAP_MAX * CANTIDAD_ACESOS_FIJOS) / ARGENTINA_POPULATION
-
-            print ("En Provincia ==", row[0])
-            calculo(CONSUMO_PROMEDIO_MBS_PROV, CAP_MAX_PROV)
-    print()
+    # print(csvGlobals.provinces.items())
+    # for p in csvGlobals.provinces:
+    #     print (csvGlobals.provinces[p])
+    #     consumoPorProvincia(p, csvGlobals.provinces[p])
+        
     print ("Para todo el pais ")
     calculo(CONSUMO_PROMEDIO_MBS,CAP_MAX)
+
+def consumoPorProvincia(seccion, cantidad):
+    CANTIDAD_ACESOS_FIJOS = cantidad
+    CONSUMO_PROMEDIO_MBS_PROV = (CONSUMO_PROMEDIO_MBS * CANTIDAD_ACESOS_FIJOS) / ARGENTINA_POPULATION
+    CAP_MAX_PROV = (CAP_MAX * CANTIDAD_ACESOS_FIJOS) / ARGENTINA_POPULATION
+
+    print (CONSUMO_PROMEDIO_MBS_PROV)
+    print ("En Provincia ==", seccion)
+    calculo(CONSUMO_PROMEDIO_MBS_PROV, CAP_MAX_PROV)
+def convertToVector(dict):
+    lst = []
+    for d in dict:
+        lst.append(dict[d])
+    return lst
 
 def calculo(CONSUMO_PROMEDIO_MBS_PROV, CAP_MAX_PROV):
     maximo_funcional = -1
@@ -64,8 +70,8 @@ def calculo(CONSUMO_PROMEDIO_MBS_PROV, CAP_MAX_PROV):
     print (f"Capacidad maxima por mes de {CAP_MAX_PROV} GB/mes")
     i = 1
     print()
-    # for i in np.arange(0, AUMENTO_COVID, 1):
-    for i in np.arange(0, AUMENTO_COVID + 0.01, 0.01):
+    for i in np.arange(0, AUMENTO_COVID, 1):
+    #for i in np.arange(0, AUMENTO_COVID + 0.01, 0.01):
         # print ('Rango -->', i)
         CONSUMO_MES_TOTAL = TIEMPO * CONSUMO_PROMEDIO_MBS_PROV * i#
         # print ('Consumo del mes (MB) es', CONSUMO_MES_TOTAL , " Mb/mes")
@@ -73,55 +79,68 @@ def calculo(CONSUMO_PROMEDIO_MBS_PROV, CAP_MAX_PROV):
         # print ('Capacidad maxima permitida (data cap)', CAP_MAX , " Mb/mes")
 
 
-        PORC_VIDEO_STREAMING = 0.6
-        PORC_WEB = 0.13100
-        PORC_GAMING = 0.0800
-        PORC_SOCIAL = 0.06100
-        PORC_FILE_SHARING = 0.04200
-        PORC_MARKETPLACE = 0.02600
-        PORC_SECURITY_AND_VPN = 0.01600
-        PORC_MESSAGING = 0.01600
-        PORC_CLOUD = 0.01400
-        PORC_AUDIO_STREAMING = 0.0400
+        # PORC_VIDEO_STREAMING = 0.6
+        # PORC_WEB = 0.13100
+        # PORC_GAMING = 0.0800
+        # PORC_SOCIAL = 0.06100
+        # PORC_FILE_SHARING = 0.04200
+        # PORC_MARKETPLACE = 0.02600
+        # PORC_SECURITY_AND_VPN = 0.01600
+        # PORC_MESSAGING = 0.01600
+        # PORC_CLOUD = 0.01400
+        # PORC_AUDIO_STREAMING = 0.0400
 
-        CONSUMO_VIDEO_STREAMING = PORC_VIDEO_STREAMING * CONSUMO_MES_TOTAL
-        CONSUMO_WEB = PORC_WEB * CONSUMO_MES_TOTAL
-        CONSUMO_GAMING = PORC_GAMING * CONSUMO_MES_TOTAL
-        CONSUMO_SOCIAL = PORC_SOCIAL * CONSUMO_MES_TOTAL
-        CONSUMO_FILE_SHARING = PORC_FILE_SHARING * CONSUMO_MES_TOTAL
-        CONSUMO_MARKETPLACE = PORC_MARKETPLACE * CONSUMO_MES_TOTAL
-        CONSUMO_SECURITY_AND_VPN = PORC_SECURITY_AND_VPN * CONSUMO_MES_TOTAL
-        CONSUMO_MESSAGING = PORC_MESSAGING * CONSUMO_MES_TOTAL
-        CONSUMO_CLOUD = PORC_CLOUD * CONSUMO_MES_TOTAL
-        CONSUMO_AUDIO_STREAMING = PORC_AUDIO_STREAMING * CONSUMO_MES_TOTAL
+        # CONSUMO_VIDEO_STREAMING = PORC_VIDEO_STREAMING * CONSUMO_MES_TOTAL
+        # CONSUMO_WEB = PORC_WEB * CONSUMO_MES_TOTAL
+        # CONSUMO_GAMING = PORC_GAMING * CONSUMO_MES_TOTAL
+        # CONSUMO_SOCIAL = PORC_SOCIAL * CONSUMO_MES_TOTAL
+        # CONSUMO_FILE_SHARING = PORC_FILE_SHARING * CONSUMO_MES_TOTAL
+        # CONSUMO_MARKETPLACE = PORC_MARKETPLACE * CONSUMO_MES_TOTAL
+        # CONSUMO_SECURITY_AND_VPN = PORC_SECURITY_AND_VPN * CONSUMO_MES_TOTAL
+        # CONSUMO_MESSAGING = PORC_MESSAGING * CONSUMO_MES_TOTAL
+        # CONSUMO_CLOUD = PORC_CLOUD * CONSUMO_MES_TOTAL
+        # CONSUMO_AUDIO_STREAMING = PORC_AUDIO_STREAMING * CONSUMO_MES_TOTAL
 
-        values = [
-            CONSUMO_VIDEO_STREAMING,
-            CONSUMO_WEB,
-            CONSUMO_GAMING,
-            CONSUMO_SOCIAL,
-            CONSUMO_FILE_SHARING,
-            CONSUMO_MARKETPLACE,
-            CONSUMO_SECURITY_AND_VPN,
-            CONSUMO_MESSAGING,
-            CONSUMO_CLOUD,
-            CONSUMO_AUDIO_STREAMING,
-        ]
+        lst = convertToVector(csvGlobals.weights)
+        # I need a vector of weights so the best way to work around this is by using index 0
+        weights = [[]]
+        for l in lst:
+            weights[0].append(l * CONSUMO_MES_TOTAL)
+        values = []
+        for value in csvGlobals.values:
+            # values.append(float(csvGlobals.values[value]) * float(csvGlobals.weights[value]))
+            values.append(float(csvGlobals.values[value]))
 
-        weights = [[
-            CONSUMO_VIDEO_STREAMING,
-            CONSUMO_WEB,
-            CONSUMO_GAMING,
-            CONSUMO_SOCIAL,
-            CONSUMO_FILE_SHARING,
-            CONSUMO_MARKETPLACE,
-            CONSUMO_SECURITY_AND_VPN,
-            CONSUMO_MESSAGING,
-            CONSUMO_CLOUD,
-            CONSUMO_AUDIO_STREAMING,
-        ]]
+        services = []
+        for value in csvGlobals.values:
+            services.append(value)
 
 
+        # values = [
+        #     CONSUMO_VIDEO_STREAMING,
+        #     CONSUMO_WEB,
+        #     CONSUMO_GAMING,
+        #     CONSUMO_SOCIAL,
+        #     CONSUMO_FILE_SHARING,
+        #     CONSUMO_MARKETPLACE,
+        #     CONSUMO_SECURITY_AND_VPN,
+        #     CONSUMO_MESSAGING,
+        #     CONSUMO_CLOUD,
+        #     CONSUMO_AUDIO_STREAMING,
+        # ]
+
+        # weights = [[
+        #     CONSUMO_VIDEO_STREAMING,
+        #     CONSUMO_WEB,
+        #     CONSUMO_GAMING,
+        #     CONSUMO_SOCIAL,
+        #     CONSUMO_FILE_SHARING,
+        #     CONSUMO_MARKETPLACE,
+        #     CONSUMO_SECURITY_AND_VPN,
+        #     CONSUMO_MESSAGING,
+        #     CONSUMO_CLOUD,
+        #     CONSUMO_AUDIO_STREAMING,
+        # ]]
         capacities = [CAP_MAX_PROV]
 
         solver.Init(values, weights, capacities)
@@ -140,9 +159,10 @@ def calculo(CONSUMO_PROMEDIO_MBS_PROV, CAP_MAX_PROV):
         # print('Total value =', computed_value)
         for i in range(len(values)):
             if solver.BestSolutionContains(i):
-                packed_items.append(i)
+                packed_items.append(services[i])
                 packed_weights.append(weights[0][i])
                 total_weight += weights[0][i]
+
         # print('Total weight:', total_weight)
         # print('Packed items:', packed_items)
         # print('Packed_weights:', packed_weights)

@@ -1,24 +1,24 @@
-Total del país,"7,511,371"
-CABA y provincia de Bs.As.,"4,866,753"
-Catamarca,"23,391"
-Chaco,"102,812"
-Chubut,"59,575"
-Córdoba,"644,362"
-Corrientes,"100,423"
-Entre Ríos,"180,472"
-Formosa,"30,740"
-Jujuy,"47,653"
-La Pampa,"53,237"
-La Rioja,"76,590"
-Mendoza,"102,280"
-Misiones,"109,007"
-Neuquén,"105,243"
-Río Negro,"74,557"
-Salta,"95,805"
-San Juan,"49,246"
-San Luis,"11,115"
-Santa Cruz,"17,460"
-Santa Fe,"563,774"
-Santiago del Estero,"25,435"
-"Tierra del Fuego, Antártida e Islas del Atlántico Sur","21,984"
-Tucumán,"149,457"
+seccion,cantidad
+CABA y provincia de Bs.As.,4866753
+Catamarca,23391
+Chaco,102812
+Chubut,59575
+Córdoba,644362
+Corrientes,100423
+Entre Ríos,180472
+Formosa,30740
+Jujuy,47653
+La Pampa,53237
+La Rioja,76590
+Mendoza,102280
+Misiones,109007
+Neuquén,105243
+Río Negro,74557
+Salta,95805
+San Juan,49246
+San Luis,11115
+Santa Cruz,17460
+Santa Fe,563774
+Santiago del Estero,25435
+"Tierra del Fuego, Antártida e Islas del Atlántico Sur",21984
+Tucumán,149457
