@@ -3,6 +3,7 @@ from ortools.algorithms import pywrapknapsack_solver
 import numpy as np
 import csvGlobals
 from termcolor import colored
+from flask import Flask
 
 
 # Evaluo cord cutting http://www.ebizlatam.com/7-millones-nuevos-usuarios-internet-los-proximos-4-anos-argentina/
@@ -171,5 +172,14 @@ def calculo(CONSUMO_PROMEDIO_MBS_PROV, CAP_MAX_PROV):
     print('Packed items:', packed_items)
     print('Packed_weights:', packed_weights)            
 
+
 if __name__ == '__main__':
     main()
+
+
+
+
+
+Pasos a seguir
+
+- recibir csv desde frontend , hacer calculo y dsp devolver los pesos y todo eso al frontend

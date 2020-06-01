@@ -18,3 +18,25 @@
     pip install colored
     pip install termcolor
     pip install pandas
+
+	pip freeze > requirements.txt
+
+# Frontend
+	
+	npm install npm@latest -g
+
+	npm install -g yarn
+	npm i -g create-react-app@3.2.0
+
+	create-react-app my-react-app
+
+	#Update node
+	sudo npm install -g n 
+
+	sudo n stable
+
+    yarn create react-app my-app
+
+	yarn add @material-ui/core@4.5.1
+
+
