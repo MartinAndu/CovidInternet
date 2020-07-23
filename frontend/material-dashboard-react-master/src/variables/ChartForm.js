@@ -11,13 +11,13 @@ const ChartForm = React.forwardRef((props,ref) => {
     ["Mes de consumo normal",11534400, 2518344, 1537920, 1172664, 807408, 499824, 307584, 307584, 269136, 768960]
     ["Mes con covid",11534400, 2518344, 1537920, 1172664, 807408, 499824, 307584, 307584, 269136, 768960]
   ]*/
-	/*const data= [
-	  ['Year', 'Sales', 'Expenses', 'Profit'],
-	  ['2014', 1000, 400, 200],
-	  ['2015', 1170, 460, 250],
-	  ['2016', 660, 1120, 300],
-	  ['2017', 1030, 540, 350],
-	]*/
+  /*const data= [
+    ['Year', 'Sales', 'Expenses', 'Profit'],
+    ['2014', 1000, 400, 200],
+    ['2015', 1170, 460, 250],
+    ['2016', 660, 1120, 300],
+    ['2017', 1030, 540, 350],
+  ]*/
 
   const [realData, setRealData] = useState(data);
 
@@ -32,10 +32,14 @@ const ChartForm = React.forwardRef((props,ref) => {
         if (data["aumento_covid"][1].indexOf(value) ==-1){
           data["aumento_covid"][0].splice(key, 0, 0)
         }
+
+        if (data["aumento_covid_todos_objetos"][1].indexOf(value) ==-1){
+          data["aumento_covid_todos_objetos"][0].splice(key, 0, 0)
+        }
       })
 
-      console.log(data["aumento_covid"][0])
       result.push(["Mes con covid",...data["aumento_covid"][0]])
+      result.push(["Mes con aumento con todos los objetos",...data["aumento_covid_todos_objetos"][0]])
 
 
       console.log("Dato", result);
@@ -48,40 +52,40 @@ const ChartForm = React.forwardRef((props,ref) => {
      width: 600,
      height: 400,
      bar: { groupWidth: '95%' },
-	   title: "Servicios consumidos por el usuario",
-	   legend: "none"
+     title: "Servicios consumidos por el usuario",
+     legend: "none"
    };
 
 
    
 /*   const margin = {top: 20, right: 20, bottom: 30, left: 40}
-  	
+    
    const [width, setOptions] = useState(initialOptions)
 
     const componentDidMount = event => {
-    	window.onresize = () => {
-    	  setWidth ({width: this.refs.root.offsetWidth}); 
-    	};
+      window.onresize = () => {
+        setWidth ({width: this.refs.root.offsetWidth}); 
+      };
 
     }
 
     const handleInputChange = event => {
-		const { element, id } = event.target
-	    console.log(`The bin ${element.text} with id ${id} was clicked`);
-  	}*/
+    const { element, id } = event.target
+      console.log(`The bin ${element.text} with id ${id} was clicked`);
+    }*/
 
     if (realData != null) {
       console.log("sdsd")
     return (
-    	<Chart
-    	  chartType="Bar"
-    	  data={realData}
-    	  options={{initialOptions}}
-    	  loader={<div>Loading Chart</div>}
-    	  width={'600px'}
-    	  height={'300px'}
-    	  legendToggle
-    	/>
+      <Chart
+        chartType="Bar"
+        data={realData}
+        options={{initialOptions}}
+        loader={<div>Loading Chart</div>}
+        width={'1000px'}
+        height={'500px'}
+        legendToggle
+      />
     )
 
 

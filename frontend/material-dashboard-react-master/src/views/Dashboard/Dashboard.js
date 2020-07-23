@@ -51,6 +51,9 @@ const Dashboard = props =>  {
   const parametros = {}
   const [realClasses, setClasses] = useState(parametros);
 
+  const [jsonData, setJsonData] = useState(null);
+
+
   const childChartForm = useRef(0);
   const [error, setError] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
