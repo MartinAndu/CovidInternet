@@ -39,4 +39,6 @@
 
 	yarn add @material-ui/core@4.5.1
 
-
+export FLASK_ENV=development
+export FLASK_APP=api.py
+flask run

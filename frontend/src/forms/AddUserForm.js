@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import ReactFileReader from 'react-file-reader'
+import csv from 'csv';
 
 
 const AddUserForm = props => {
@@ -20,28 +21,39 @@ const AddUserForm = props => {
 	const handleFiles = files => {
 	    var reader = new FileReader();
 	    reader.onload = function(e) {
-	        // Use reader.result
-	        alert(reader.result)
+
+	    	csv.parse(reader.result, (err, data) => {
+		    	 
+		    	 const requestOptions = {
+		    		method : 'Post',
+		    		headers: { 'Content-Type': 'application/json' },
+		    		body: JSON.stringify(data)
+		    	 }
+
+		    	fetch("/getJson", requestOptions)
+		    	  .then(res => res.json())
+		    	  .then(
+		    	    (result) => {
+		    	      setIsLoaded(true);
+		    	      console.log(result)
+		    	      setItems(result.items);
+		    	    },
+		    	    // Nota: es importante manejar errores aquí y no en 
+		    	    // un bloque catch() para que no interceptemos errores
+		    	    // de errores reales en los componentes.
+		    	    (error) => {
+		    	      setIsLoaded(true);
+		    	      setError(error);
+		    	    }
+		    	  )
+
+	    	 });
 	    }
 	    reader.readAsText(files[0]);
 	}
 
 	useEffect(() => {
-	  fetch("https://api.example.com/items")
-	    .then(res => res.json())
-	    .then(
-	      (result) => {
-	        setIsLoaded(true);
-	        setItems(result.items);
-	      },
-	      // Nota: es importante manejar errores aquí y no en 
-	      // un bloque catch() para que no interceptemos errores
-	      // de errores reales en los componentes.
-	      (error) => {
-	        setIsLoaded(true);
-	        setError(error);
-	      }
-	    )
+	  console.log('Bienvenido a Internet Solidario');
 	}, [])
 	
 

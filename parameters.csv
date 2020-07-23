@@ -1,0 +1,11 @@
+service,weight,values,avg_mbps_monthly,avg_use,max_cap_tb,increase_covid
+VIDEO STREAMING,0.6,9,17.8,10,3,1.32
+HTTP WEB,0.131,2,,,,
+GAMING,0.08,7,,,,
+SOCIAL,0.061,10,,,,
+FILE SHARING,0.042,5,,,,
+MARKETPLACE,0.026,4,,,,
+SECURITY AND VPN,0.016,3,,,,
+MESSAGING,0.016,2,,,,
+CLOUD,0.014,1,,,,
+AUDIO STREAMING,0.04,0,,,,
