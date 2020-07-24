@@ -34,6 +34,7 @@ import ReactFileReader from 'react-file-reader'
 import ChartForm from "variables/ChartForm"
 
 import { bugs, website, server } from "variables/general.js";
+// import {MDCIconButtonToggle} from '@material/icon-button';
 
 import {
   dailySalesChart,
@@ -44,6 +45,9 @@ import {
 import styles from "assets/jss/material-dashboard-react/views/dashboardStyle.js";
 
 const useStyles = makeStyles(styles);
+
+// const iconToggle = new MDCIconButtonToggle(document.querySelector('.mdc-icon-button'));
+// const buttonRipple = new MDCRipple(document.querySelector('.mdc-button'));
 
 const Dashboard = props =>  {
 
@@ -68,18 +72,44 @@ const Dashboard = props =>  {
     setUser({ ...user, [name] : value})
   }
 
+  const formatJson = data => {
+    let param = {}
+    param["services"] = []
+    param["weights"] = {}
+    param["values"] = {}
+    param["parameters"] = {}
+
+    let columna = (data[0]).slice()
+    let datos = data.slice(1)
+
+    datos.map( (value, key) => {
+      var service = value[columna.indexOf("service")];
+      param["services"].push(service)
+      param["weights"][service] = value[columna.indexOf("weight")]
+      param["values"][service] = value[columna.indexOf("values")]
+    })
+
+    param["parameters"]["avg_mbps_monthly"] = data[1][columna.indexOf("avg_mbps_monthly")]
+    param["parameters"]["avg_use"] = data[1][columna.indexOf("avg_use")]
+    param["parameters"]["max_cap_tb"] = data[1][columna.indexOf("max_cap_tb")]
+    param["parameters"]["increase_covid"] = data[1][columna.indexOf("increase_covid")]
+
+    return param
+  }
+
   const handleFiles = files => {
       var reader = new FileReader();
       reader.onload = function(e) {
 
         console.log(childChartForm);
         csv.parse(reader.result, (err, data) => {
-           
-
+            
+          let param = formatJson(data)
+          let jsonData = JSON.stringify(param)
            const requestOptions = {
             method : 'Post',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
+            body: jsonData
            }
 
           parametros["uso_promedio_mb"] = data[1][3] // Uso promedio Mb/s
@@ -87,6 +117,7 @@ const Dashboard = props =>  {
           parametros["TB"] = data[1][5] // Maxima capacidad Tb
           parametros["incremento_covid"] = data[1][6] * 100 - 100 // Incremento Covid
 
+          setJsonData(jsonData)
           setClasses(parametros)
           fetch("/getJson", requestOptions)
             .then(res => res.json())
@@ -111,6 +142,31 @@ const Dashboard = props =>  {
          });
       }
       reader.readAsText(files[0]);
+  }
+
+
+  const saveFiles = files => { 
+
+      const requestOptions = {
+       method : 'Post',
+       headers: { 'Content-Type': 'application/json' },
+       body: jsonData
+      }
+
+      fetch("/saveJson", requestOptions)
+        .then(res => res.json())
+        .then(
+          (result) => {
+            console.log(result);  
+          },
+          // Nota: es importante manejar errores aquí y no en 
+          // un bloque catch() para que no interceptemos errores
+          // de errores reales en los componentes.
+          (error) => {
+            setIsLoaded(true);
+            setError(error);
+          }
+        ) 
   }
 
   useEffect(() => {
@@ -201,225 +257,33 @@ const Dashboard = props =>  {
          </GridItem>
        </GridContainer>
        <GridContainer>
-         <form>
-          <ReactFileReader handleFiles={handleFiles} fileTypes={'.csv'}>
-              <button type="button" className='btn'>Upload</button>
-          </ReactFileReader>
+         <form> 
+
+          <GridItem xs={6} sm={6} md={3}>
+              <ReactFileReader handleFiles={handleFiles} fileTypes={'.csv'}>
+                <div className="mdc-touch-target-wrapper">
+                  <button data-style type="button" >
+                    <div className="mdc-button__ripple"></div>
+                    <span className="mdc-button__label">Upload</span>
+                    <div className="mdc-button__touch"></div>
+                  </button>
+                </div>
+              </ReactFileReader>
+          </GridItem >
+          <GridItem xs={12} sm={6} md={3}>
+           <div className="mdc-touch-target-wrapper">
+             <button data-style className={jsonData} onClick={saveFiles} type="button" >
+               <div className="mdc-button__ripple"></div>
+               <span className="mdc-button__label">Guardar</span>
+               <div className="mdc-button__touch"></div>
+             </button>
+            </div>
+          </GridItem >
+
          </form>
        </GridContainer>
      </div>
-
-  )
+    );
 }
 
 export default Dashboard
-
-
-
-
-
-/*return (
-     <div>
-       <GridContainer>
-         <GridItem xs={12} sm={6} md={3}>
-           <Card>
-             <CardHeader color="warning" stats icon>
-               <CardIcon color="warning">
-                 <Icon>content_copy</Icon>
-               </CardIcon>
-               <p className={classes.cardCategory}>Used Space</p>
-               <h3 className={classes.cardTitle}>
-                 49/50 <small>GB</small>
-               </h3>
-             </CardHeader>
-             <CardFooter stats>
-               <div className={classes.stats}>
-                 <Danger>
-                   <Warning />
-                 </Danger>
-                 <a href="#pablo" onClick={e => e.preventDefault()}>
-                   Get more space
-                 </a>
-               </div>
-             </CardFooter>
-           </Card>
-         </GridItem>
-         <GridItem xs={12} sm={6} md={3}>
-           <Card>
-             <CardHeader color="success" stats icon>
-               <CardIcon color="success">
-                 <Store />
-               </CardIcon>
-               <p className={classes.cardCategory}>Revenue</p>
-               <h3 className={classes.cardTitle}>$34,245</h3>
-             </CardHeader>
-             <CardFooter stats>
-               <div className={classes.stats}>
-                 <DateRange />
-                 Last 24 Hours
-               </div>
-             </CardFooter>
-           </Card>
-         </GridItem>
-         <GridItem xs={12} sm={6} md={3}>
-           <Card>
-             <CardHeader color="danger" stats icon>
-               <CardIcon color="danger">
-                 <Icon>info_outline</Icon>
-               </CardIcon>
-               <p className={classes.cardCategory}>Fixed Issues</p>
-               <h3 className={classes.cardTitle}>75</h3>
-             </CardHeader>
-             <CardFooter stats>
-               <div className={classes.stats}>
-                 <LocalOffer />
-                 Tracked from Github
-               </div>
-             </CardFooter>
-           </Card>
-         </GridItem>
-         <GridItem xs={12} sm={6} md={3}>
-           <Card>
-             <CardHeader color="info" stats icon>
-               <CardIcon color="info">
-                 <Accessibility />
-               </CardIcon>
-               <p className={classes.cardCategory}>Followers</p>
-               <h3 className={classes.cardTitle}>+245</h3>
-             </CardHeader>
-             <CardFooter stats>
-               <div className={classes.stats}>
-                 <Update />
-                 Just Updated
-               </div>
-             </CardFooter>
-           </Card>
-         </GridItem>
-       </GridContainer>
-       <GridContainer>
-         <GridItem xs={12} sm={12} md={4}>
-           <Card chart>
-             <ChartForm ref={childChartForm}/>
-             <CardHeader color="warning">
-               <ChartistGraph
-                 className="ct-chart"
-                 data={emailsSubscriptionChart.data}
-                 type="Bar"
-                 options={emailsSubscriptionChart.options}
-                 responsiveOptions={emailsSubscriptionChart.responsiveOptions}
-                 listener={emailsSubscriptionChart.animation}
-               />
-             </CardHeader>
-             <CardBody>
-               <h4 className={classes.cardTitle}>Consumos Personales</h4>
-               <p className={classes.cardCategory}>Last Campaign Performance</p>
-             </CardBody>
-             <CardFooter chart>
-               <div className={classes.stats}>
-                 <AccessTime /> campaign sent 2 days ago
-               </div>
-             </CardFooter>
-           </Card>
-         </GridItem>
-         <GridItem xs={12} sm={12} md={4}>
-           <Card chart>
-             <CardHeader color="danger">
-               <ChartistGraph
-                 className="ct-chart"
-                 data={completedTasksChart.data}
-                 type="Line"
-                 options={completedTasksChart.options}
-                 listener={completedTasksChart.animation}
-               />
-             </CardHeader>
-             <CardBody>
-               <h4 className={classes.cardTitle}>Completed Tasks</h4>
-               <p className={classes.cardCategory}>Last Campaign Performance</p>
-             </CardBody>
-             <CardFooter chart>
-               <div className={classes.stats}>
-                 <AccessTime /> campaign sent 2 days ago
-               </div>
-             </CardFooter>
-           </Card>
-         </GridItem>
-       </GridContainer>
-       <GridContainer>
-         <GridItem xs={12} sm={12} md={6}>
-           <CustomTabs
-             title="Tasks:"
-             headerColor="primary"
-             tabs={[
-               {
-                 tabName: "Bugs",
-                 tabIcon: BugReport,
-                 tabContent: (
-                   <Tasks
-                     checkedIndexes={[0, 3]}
-                     tasksIndexes={[0, 1, 2, 3]}
-                     tasks={bugs}
-                   />
-                 )
-               },
-               {
-                 tabName: "Website",
-                 tabIcon: Code,
-                 tabContent: (
-                   <Tasks
-                     checkedIndexes={[0]}
-                     tasksIndexes={[0, 1]}
-                     tasks={website}
-                   />
-                 )
-               },
-               {
-                 tabName: "Server",
-                 tabIcon: Cloud,
-                 tabContent: (
-                   <Tasks
-                     checkedIndexes={[1]}
-                     tasksIndexes={[0, 1, 2]}
-                     tasks={server}
-                   />
-                 )
-               }
-             ]}
-           />
-         </GridItem>
-         <form>
-          <label>Name</label>
-          <input type="text" name="name" value={user.name} onChange={handleInputChange} />
-          <label>UserName</label>
-          <input type="text" name="username" value={user.username} onChange={handleInputChange} />
-          <button>Add new user</button>
-          <ReactFileReader handleFiles={handleFiles} fileTypes={'.csv'}>
-              <button type="button" className='btn'>Upload</button>
-          </ReactFileReader>
-         </form>
-         <GridItem xs={12} sm={12} md={6}>
-           <Card>
-             <CardHeader color="warning">
-               <h4 className={classes.cardTitleWhite}>Employees Stats</h4>
-               <p className={classes.cardCategoryWhite}>
-                 New employees on 15th September, 2016
-               </p>
-             </CardHeader>
-             <CardBody>
-               <Table
-                 tableHeaderColor="warning"
-                 tableHead={["ID", "Name", "Salary", "Country"]}
-                 tableData={[
-                   ["1", "Dakota Rice", "$36,738", "Niger"],
-                   ["2", "Minerva Hooper", "$23,789", "Curaçao"],
-                   ["3", "Sage Rodriguez", "$56,142", "Netherlands"],
-                   ["4", "Philip Chaney", "$38,735", "Korea, South"]
-                 ]}
-               />
-             </CardBody>
-           </Card>
-         </GridItem>
-       </GridContainer>
-     </div>
-
-  )*/
-
