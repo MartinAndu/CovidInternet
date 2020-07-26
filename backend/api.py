@@ -23,9 +23,8 @@ def get_json_data(parameters):
 def hello_world():
     if request.method == 'POST':
         print('post app')
-        print(request.json)
         req = request.json
-
+        print(req)
         values = dict()
         weights = dict() 
 
@@ -66,3 +65,11 @@ def getAll():
     if request.method == 'GET':
         db = TinyDB('db.json')
         return json.dumps(db.all())
+
+@app.route('/get/<doc_id>', methods=['GET'])
+def getByDocID(doc_id):
+    if request.method == 'GET':
+        index = int(doc_id)
+        db = TinyDB('db.json')
+        
+        return json.dumps(db.get(doc_id=index))

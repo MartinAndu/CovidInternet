@@ -65,9 +65,9 @@ const TableList = props => {
           result.map( x => {
             let d = []
             d.push(x["doc_id"].toString())
-            d.push(x["parameters"]["max_cap_tb"].toString())
-            d.push(x["parameters"]["avg_mbps_monthly"].toString())
-            d.push(x["parameters"]["avg_use"].toString())
+            d.push(x["parameters"]["max_cap_tb"].toString() + "Tb")
+            d.push(x["parameters"]["avg_mbps_monthly"].toString() + "Mb/s")
+            d.push(x["parameters"]["avg_use"].toString() + "Hs")
             d.push(x["services"].toString())
             data.push(d)
           })
@@ -98,7 +98,7 @@ const TableList = props => {
             <CardBody>
               <Table
                 tableHeaderColor="primary"
-                tableHead={["Id", "Max Capacidad", "Mb/s", "Horas uso Promedio", "Servicios Consumidos"]}
+                tableHead={["", "Id", "Max Capacidad", "Mb/s", "Horas uso Promedio", "Servicios Consumidos"]}
                 tableData={dataTable}
               />
             </CardBody>
@@ -110,13 +110,3 @@ const TableList = props => {
 
 
 export default TableList
-
-/*
- [
-                ["Dakota Rice", "Niger", "Oud-Turnhout", "$36,738"],
-                ["Minerva Hooper", "Curaçao", "Sinaai-Waas", "$23,789"],
-                ["Sage Rodriguez", "Netherlands", "Baileux", "$56,142"],
-                ["Philip Chaney", "Korea, South", "Overland Park", "$38,735"],
-                ["Doris Greene", "Malawi", "Feldkirchen in Kärnten", "$63,542"],
-                ["Mason Porter", "Chile", "Gloucester", "$78,615"]
-              ]*/

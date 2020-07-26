@@ -21,11 +21,28 @@ const ChartForm = React.forwardRef((props,ref) => {
 
   const [realData, setRealData] = useState(data);
 
+  const mayorCantidadObjetosIndice = (data) => {
+    let mayores = {}
+    mayores["normal"] = data["normal"][1]
+    mayores["aumento_covid"] = data["aumento_covid"][1]
+    mayores["aumento_covid_todos_objetos"] = data["aumento_covid_todos_objetos"][1]
+
+    let indiceMayor = "normal";
+    if (mayores[indiceMayor] <  mayores["aumento_covid"])
+      indiceMayor = "aumento_covid"
+    if (mayores[indiceMayor] < mayores["aumento_covid_todos_objetos"])
+      indiceMayor = "aumento_covid_todos_objetos"
+
+    return indiceMayor
+  }
 
   useImperativeHandle(ref, (data) => ({
     updateData(data)  {
       var result = []
-      result.push(["Consumo por Mes",...data["normal"][1]])
+
+
+
+      result.push(["Consumo por Mes",...data[mayorCantidadObjetosIndice(data)][1]])
       result.push(["Mes de consumo normal",...data["normal"][0]])
 
       data["normal"][1].forEach((value,key) => {

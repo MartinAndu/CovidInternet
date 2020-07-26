@@ -51,7 +51,11 @@ def main(parameters):
     print("Calculo mochila normal")
     parametros = dict()
     parametros["normal"] = calculoMochila(CONSUMO_PROMEDIO_MBS,CAP_MAX,AUMENTO_COVID = AUMENTO_COVID, INICIO = 1, STEP = 1)
+
+    print("Calculo mochila con aumento covid")
     parametros["aumento_covid"] = calculoMochila(CONSUMO_PROMEDIO_MBS,CAP_MAX,AUMENTO_COVID = AUMENTO_COVID + 0.01, INICIO = 1, STEP = 0.01)
+
+    print("Calculo mochila conservando todos los servicios")
     parametros["aumento_covid_todos_objetos"] = calculoMochila(CONSUMO_PROMEDIO_MBS,CAP_MAX,AUMENTO_COVID = parametros["aumento_covid"][2]["maximo_aumento_permitido_todos_los_objetos"], INICIO = 1, STEP = 0.01)
 
     # print()
@@ -89,7 +93,6 @@ def calculoMochila(CONSUMO_PROMEDIO_MBS_PROV,CAP_MAX_PROV,AUMENTO_COVID, INICIO,
 
     lst = convertToVector(csvGlobals.weights)
     # I need a vector of weights so the best way to work around this is by using index 0
-    values = []
     services = []
     for value in csvGlobals.values:
         services.append(value)

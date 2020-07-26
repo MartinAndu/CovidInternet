@@ -72,6 +72,26 @@ const Dashboard = props =>  {
     setUser({ ...user, [name] : value})
   }
 
+  useEffect(() => {
+    if (props.id != null && props.id != undefined) {
+      fetch("/get/" +  props.id.dataId)
+        .then(res => res.json())
+        .then(
+          (result) => {
+            getData(result)
+          },
+          // Nota: es importante manejar errores aquí y no en 
+          // un bloque catch() para que no interceptemos errores
+          // de errores reales en los componentes.
+          (error) => {
+            setIsLoaded(true);
+            setError(error);
+          }
+        )  
+      }
+    }, [])
+
+
   const formatJson = data => {
     let param = {}
     param["services"] = []
@@ -101,49 +121,54 @@ const Dashboard = props =>  {
       var reader = new FileReader();
       reader.onload = function(e) {
 
-        console.log(childChartForm);
         csv.parse(reader.result, (err, data) => {
             
           let param = formatJson(data)
-          let jsonData = JSON.stringify(param)
-           const requestOptions = {
-            method : 'Post',
-            headers: { 'Content-Type': 'application/json' },
-            body: jsonData
-           }
-
-          parametros["uso_promedio_mb"] = data[1][3] // Uso promedio Mb/s
-          parametros["uso_promedio_hs"] = data[1][4] // Uso promedio Hs
-          parametros["TB"] = data[1][5] // Maxima capacidad Tb
-          parametros["incremento_covid"] = data[1][6] * 100 - 100 // Incremento Covid
-
-          setJsonData(jsonData)
-          setClasses(parametros)
-          fetch("/getJson", requestOptions)
-            .then(res => res.json())
-            .then(
-              (result) => {
-                setIsLoaded(true);
-
-                childChartForm.current.updateData(result)
-
-                console.log(result)
-                setItems(result.items);
-              },
-              // Nota: es importante manejar errores aquí y no en 
-              // un bloque catch() para que no interceptemos errores
-              // de errores reales en los componentes.
-              (error) => {
-                setIsLoaded(true);
-                setError(error);
-              }
-            )
+          getData(param)
 
          });
       }
       reader.readAsText(files[0]);
   }
 
+  const getData = param => {
+
+    let jsonData = JSON.stringify(param)
+     const requestOptions = {
+      method : 'Post',
+      headers: { 'Content-Type': 'application/json' },
+      body: jsonData
+     }
+
+    parametros["uso_promedio_mb"] = param["parameters"]["avg_mbps_monthly"]// data[1][3] // Uso promedio Mb/s
+    parametros["uso_promedio_hs"] = param["parameters"]["avg_use"] //data[1][4] // Uso promedio Hs
+    parametros["TB"] = param["parameters"]["max_cap_tb"]// data[1][5] // Maxima capacidad Tb
+    parametros["incremento_covid"] =  param["parameters"]["increase_covid"] * 100 - 100 // data[1][6]  // Incremento Covid
+
+    console.log(jsonData);
+
+    setJsonData(jsonData)
+    setClasses(parametros)
+    fetch("/getJson", requestOptions)
+      .then(res => res.json())
+      .then(
+        (result) => {
+          setIsLoaded(true);
+
+          childChartForm.current.updateData(result)
+
+          console.log(result)
+          setItems(result.items);
+        },
+        // Nota: es importante manejar errores aquí y no en 
+        // un bloque catch() para que no interceptemos errores
+        // de errores reales en los componentes.
+        (error) => {
+          setIsLoaded(true);
+          setError(error);
+        }
+      )
+  }
 
   const saveFiles = files => { 
 
