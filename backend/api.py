@@ -73,3 +73,13 @@ def getByDocID(doc_id):
         db = TinyDB('db.json')
         
         return json.dumps(db.get(doc_id=index))
+
+
+
+@app.route('/deleteAll', methods=['GET'])
+def deleteAll():
+    if request.method == 'GET':
+        db = TinyDB('db.json')
+        print(db)
+        db.truncate()
+        return json.dumps(db.all())   

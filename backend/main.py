@@ -107,6 +107,7 @@ def calculoMochila(CONSUMO_PROMEDIO_MBS_PROV,CAP_MAX_PROV,AUMENTO_COVID, INICIO,
     print(STEP)
     packed_items = []   
     packed_weights = []
+    computed_value = 0
     total_weight = 0
     for i in np.arange(INICIO, AUMENTO_COVID, STEP):
     # for i in np.arange(0, AUMENTO_COVID + 0.01, 0.01):
@@ -224,6 +225,7 @@ def calculoMochila(CONSUMO_PROMEDIO_MBS_PROV,CAP_MAX_PROV,AUMENTO_COVID, INICIO,
     parametros["maximo_aumento_permitido_todos_los_objetos"] = maximo_aumento_permitido_todos_los_objetos
     parametros["maximo_funcional"] = maximo_funcional
     parametros["total_weight"] = total_weight
+    parametros["computed_value"] = computed_value
 
 
     return (packed_weights, packed_items, parametros)

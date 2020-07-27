@@ -9,11 +9,13 @@ import Icon from "@material-ui/core/Icon";
 // @material-ui/icons
 import Store from "@material-ui/icons/Store";
 import Warning from "@material-ui/icons/Warning";
+// import Alert from "@material-ui/lab/Alert";
 import DateRange from "@material-ui/icons/DateRange";
 import LocalOffer from "@material-ui/icons/LocalOffer";
 import Update from "@material-ui/icons/Update";
 import ArrowUpward from "@material-ui/icons/ArrowUpward";
 import AccessTime from "@material-ui/icons/AccessTime";
+import Button from "components/CustomButtons/Button.js";
 import Accessibility from "@material-ui/icons/Accessibility";
 import BugReport from "@material-ui/icons/BugReport";
 import Code from "@material-ui/icons/Code";
@@ -25,7 +27,9 @@ import Table from "components/Table/Table.js";
 import Tasks from "components/Tasks/Tasks.js";
 import CustomTabs from "components/CustomTabs/CustomTabs.js";
 import Danger from "components/Typography/Danger.js";
+import Info from "components/Typography/Info.js";
 import Card from "components/Card/Card.js";
+import TableList from "views/TableList/TableList.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardIcon from "components/Card/CardIcon.js";
 import CardBody from "components/Card/CardBody.js";
@@ -62,6 +66,8 @@ const Dashboard = props =>  {
   const [error, setError] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [items, setItems] = useState([]);
+  const [visibilityState, setVisibility] = useState("visible");
+  // const [backTable, setBackTable] = useState(null)
 
   const initialFormState = { id : null, name: '', username: ''}
   const [user, setUser] = useState(initialFormState)
@@ -72,8 +78,14 @@ const Dashboard = props =>  {
     setUser({ ...user, [name] : value})
   }
 
+
+
+
   useEffect(() => {
+      console.log("useEffect")
+
     if (props.id != null && props.id != undefined) {
+      setVisibility("hidden")
       fetch("/get/" +  props.id.dataId)
         .then(res => res.json())
         .then(
@@ -183,6 +195,7 @@ const Dashboard = props =>  {
         .then(
           (result) => {
             console.log(result);  
+            document.location.href = "/admin/table"
           },
           // Nota: es importante manejar errores aquí y no en 
           // un bloque catch() para que no interceptemos errores
@@ -197,6 +210,14 @@ const Dashboard = props =>  {
   useEffect(() => {
     console.log('Bienvenido a Internet Solidario');
   }, [])
+
+
+/*
+  if (backTable) {
+      console.log("Vuelvo a tablas");
+      return <TableList/>;
+  }
+*/
 
   return (
      <div>
@@ -214,12 +235,8 @@ const Dashboard = props =>  {
              </CardHeader>
              <CardFooter stats>
                <div className={classes.stats}>
-                 <Danger>
-                   <Warning />
-                 </Danger>
-                 <a href="#pablo" onClick={e => e.preventDefault()}>
-                   Get more space
-                 </a>
+                <LocalOffer/>
+                  Tb por mes
                </div>
              </CardFooter>
            </Card>
@@ -235,8 +252,8 @@ const Dashboard = props =>  {
              </CardHeader>
              <CardFooter stats>
                <div className={classes.stats}>
-                 <DateRange />
-                 Last 24 Hours
+                 <LocalOffer />
+                 Cantidad de horas de uso
                </div>
              </CardFooter>
            </Card>
@@ -253,7 +270,7 @@ const Dashboard = props =>  {
              <CardFooter stats>
                <div className={classes.stats}>
                  <LocalOffer />
-                 Tracked from Github
+                 Incremento aproximado de consumo 
                </div>
              </CardFooter>
            </Card>
@@ -269,8 +286,8 @@ const Dashboard = props =>  {
              </CardHeader>
              <CardFooter stats>
                <div className={classes.stats}>
-                 <Update />
-                 Just Updated
+                 <LocalOffer />
+                 Promedio de Megabits por segundo consumido
                </div>
              </CardFooter>
            </Card>
@@ -283,26 +300,21 @@ const Dashboard = props =>  {
        </GridContainer>
        <GridContainer>
          <form> 
-
           <GridItem xs={6} sm={6} md={3}>
-              <ReactFileReader handleFiles={handleFiles} fileTypes={'.csv'}>
-                <div className="mdc-touch-target-wrapper">
-                  <button data-style type="button" >
+            <div className="mdc-touch-target-wrapper" style={{ display: "inline-flex" }}>
+              <ReactFileReader handleFiles={handleFiles} fileTypes={'.csv'} >
+                  <Button data-style type="button" style={{visibility: visibilityState, marginLeft: "auto" }} >
                     <div className="mdc-button__ripple"></div>
                     <span className="mdc-button__label">Upload</span>
                     <div className="mdc-button__touch"></div>
-                  </button>
-                </div>
+                  </Button>
               </ReactFileReader>
-          </GridItem >
-          <GridItem xs={12} sm={6} md={3}>
-           <div className="mdc-touch-target-wrapper">
-             <button data-style className={jsonData} onClick={saveFiles} type="button" >
-               <div className="mdc-button__ripple"></div>
-               <span className="mdc-button__label">Guardar</span>
-               <div className="mdc-button__touch"></div>
-             </button>
-            </div>
+              <Button data-style className={jsonData} onClick={saveFiles} type="button"  style={{visibility: visibilityState}}>
+                <div className="mdc-button__ripple"></div>
+                <span className="mdc-button__label">Guardar</span>
+                <div className="mdc-button__touch"></div>
+              </Button>  
+            </div>   
           </GridItem >
 
          </form>

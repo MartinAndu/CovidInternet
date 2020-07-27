@@ -41,9 +41,10 @@ const ChartForm = React.forwardRef((props,ref) => {
       var result = []
 
 
+      console.log(data)
 
       result.push(["Consumo por Mes",...data[mayorCantidadObjetosIndice(data)][1]])
-      result.push(["Mes de consumo normal",...data["normal"][0]])
+      result.push(["Mes de consumo normal" + "\nFuncional " + data["normal"][2]["computed_value"] + "\nPeso total " + (data["normal"][2]["total_weight"]* 100 - 100).toFixed(2),...data["normal"][0]])
 
       data["normal"][1].forEach((value,key) => {
         if (data["aumento_covid"][1].indexOf(value) ==-1){
@@ -55,8 +56,13 @@ const ChartForm = React.forwardRef((props,ref) => {
         }
       })
 
-      result.push(["Mes con covid",...data["aumento_covid"][0]])
-      result.push(["Mes con aumento con todos los objetos",...data["aumento_covid_todos_objetos"][0]])
+      var str = "Consumo optimo" +
+       "\nFuncional " +
+        data["aumento_covid_todos_objetos"][2]["computed_value"].toString() +
+         "\nPeso total " + data["aumento_covid_todos_objetos"][2]["total_weight"].toString() + 
+         "\nPorcentaje aumento: " + (data["aumento_covid_todos_objetos"][2]["maximo_aumento_permitido_todos_los_objetos"] * 100 - 100).toFixed(2).toString() + "%" 
+      result.push(["Consumo con aumento de" + "\nFuncional " + data["aumento_covid"][2]["computed_value"].toString() + "\nPeso total " + (data["aumento_covid"][2]["total_weight"]* 100 - 100).toFixed(2).toString(),...data["aumento_covid"][0]])
+      result.push([str,...data["aumento_covid_todos_objetos"][0]])
 
 
       console.log("Dato", result);
@@ -70,7 +76,7 @@ const ChartForm = React.forwardRef((props,ref) => {
      height: 400,
      bar: { groupWidth: '95%' },
      title: "Servicios consumidos por el usuario",
-     legend: "none"
+     legend: "none",
    };
 
 
@@ -101,7 +107,7 @@ const ChartForm = React.forwardRef((props,ref) => {
         loader={<div>Loading Chart</div>}
         width={'1000px'}
         height={'500px'}
-        legendToggle
+        
       />
     )
 
