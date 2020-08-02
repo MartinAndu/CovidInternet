@@ -37,13 +37,22 @@ def hello_world():
         parameters = dict()
         parameters['weights'] = weights
         parameters['values'] = values
+        parameters['services'] = req["services"]
         parameters['avg_mbps_monthly'] = req["parameters"]["avg_mbps_monthly"] # req[0][3]
         parameters['avg_use'] =  req["parameters"]["avg_use"] # req[0][4]
         parameters['max_cap_tb'] =  req["parameters"]["max_cap_tb"] # req[0][5]
         parameters['increase_covid'] = req["parameters"]["increase_covid"] # req[0][6]
+        resultado = main(parameters)
 
+        resultado["parameters"] = dict()
+        resultado["parameters"]['values'] = values
+        resultado["parameters"]['services'] = req["services"]
+        resultado["parameters"]['avg_mbps_monthly'] = req["parameters"]["avg_mbps_monthly"] # req[0][3]
+        resultado["parameters"]['avg_use'] =  req["parameters"]["avg_use"] # req[0][4]
+        resultado["parameters"]['max_cap_tb'] =  req["parameters"]["max_cap_tb"] # req[0][5]
+        resultado["parameters"]['increase_covid'] = req["parameters"]["increase_covid"] # req[0][6]
 
-        json_result = get_json_data(main(parameters))
+        json_result = get_json_data(resultado)
 
         # json_result = get_json_data(main(weights, values))
 
