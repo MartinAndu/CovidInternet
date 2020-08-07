@@ -1,4 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react'
+
+import ButtonAlert from '@material-ui/core/Button';
+import Snackbar from '@material-ui/core/Snackbar';
+import MuiAlert from '@material-ui/lab/Alert';
+
+
 import csv from 'csv';
 
 // react plugin for creating charts
@@ -49,18 +55,29 @@ import {
 import styles from "assets/jss/material-dashboard-react/views/dashboardStyle.js";
 
 const useStyles = makeStyles(styles);
-
+/*
+  const useStyles = makeStyles((theme) => ({
+    root: {
+      width: '100%',
+      '& > * + *': {
+        marginTop: theme.spacing(2),
+      },
+    },
+  }));*/
 // const iconToggle = new MDCIconButtonToggle(document.querySelector('.mdc-icon-button'));
 // const buttonRipple = new MDCRipple(document.querySelector('.mdc-button'));
 
-const Dashboard = props =>  {
+  function Alert(props) {
+    return <MuiAlert elevation={6} variant="filled" {...props} />;
+  }
 
+const Dashboard = props =>  {
   const classes = useStyles();
   const parametros = {}
   const [realClasses, setClasses] = useState(parametros);
 
   const [jsonData, setJsonData] = useState(null);
-
+  const [open, setOpen] = useState(false);
 
   const childChartForm = useRef(0);
   const [error, setError] = useState(null);
@@ -68,7 +85,7 @@ const Dashboard = props =>  {
   const [items, setItems] = useState([]);
   const [visibilityState, setVisibility] = useState("visible");
   // const [backTable, setBackTable] = useState(null)
-
+  
   const initialFormState = { id : null, name: '', username: ''}
   const [user, setUser] = useState(initialFormState)
 
@@ -155,7 +172,7 @@ const Dashboard = props =>  {
     parametros["uso_promedio_mb"] = param["parameters"]["avg_mbps_monthly"]// data[1][3] // Uso promedio Mb/s
     parametros["uso_promedio_hs"] = param["parameters"]["avg_use"] //data[1][4] // Uso promedio Hs
     parametros["TB"] = param["parameters"]["max_cap_tb"]// data[1][5] // Maxima capacidad Tb
-    parametros["incremento_covid"] =  param["parameters"]["increase_covid"] * 100 - 100 // data[1][6]  // Incremento Covid
+    parametros["incremento_covid"] =  param["parameters"]["increase_covid"]// data[1][6]  // Incremento Covid
 
     console.log(jsonData);
 
@@ -207,6 +224,20 @@ const Dashboard = props =>  {
         ) 
   }
 
+  const handleClick = () => {
+    setOpen(true);
+  };
+
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setOpen(false);
+  };
+
+
+
   useEffect(() => {
     console.log('Bienvenido a Internet Solidario');
   }, [])
@@ -217,10 +248,37 @@ const Dashboard = props =>  {
       console.log("Vuelvo a tablas");
       return <TableList/>;
   }
-*/
+*/  
+  /*
+  <div>
+     <div className={classes.root}>
+       <Button variant="outlined" onClick={handleClick}>
+         Open success snackbar
+       </Button>
+       <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+         <Alert onClose={handleClose} severity="success">
+           This is a success message!
+         </Alert>
+       </Snackbar>
+       <Alert severity="error">This is an error message!</Alert>
+       <Alert severity="warning">This is a warning message!</Alert>
+       <Alert severity="info">This is an information message!</Alert>
+       <Alert severity="success">This is a success message!</Alert>
+     </div>*/
+
 
   return (
-     <div>
+    <div>
+       <div className={classes.root}>
+         <Button variant="outlined" onClick={handleClick}>
+           Open success snackbar
+         </Button>
+         <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+           <Alert onClose={handleClose} severity="success">
+             Se ha guardado con éxito!
+           </Alert>
+         </Snackbar>
+       </div>
        <GridContainer>
          <GridItem xs={12} sm={6} md={3}>
            <Card>

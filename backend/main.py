@@ -53,7 +53,15 @@ def main(parameters):
     parametros["normal"] = calculoMochila(CONSUMO_PROMEDIO_MBS,CAP_MAX,AUMENTO_COVID = 1.1, INICIO = 1, STEP = 1)
 
     print("Calculo mochila con aumento covid")
-    parametros["aumento_covid"] = calculoMochila(CONSUMO_PROMEDIO_MBS,CAP_MAX,AUMENTO_COVID = AUMENTO_COVID + 0.01, INICIO = 1, STEP = 0.01)
+    parametros["aumento_covid"] = calculoMochila(CONSUMO_PROMEDIO_MBS,CAP_MAX,AUMENTO_COVID = 1 + 0.01*AUMENTO_COVID, INICIO = 1, STEP = 0.01)
+
+    print("Calculo mochila aumento mas optimo")
+    step = 0.01 
+    aumento_covid_temp = parametros["aumento_covid"][2]["maximo_aumento_permitido"]
+    if (aumento_covid_temp == 1):
+        step = 1
+        aumento_covid_temp = 1.1
+    parametros["aumento_covid_varios_objetos"] = calculoMochila(CONSUMO_PROMEDIO_MBS,CAP_MAX,AUMENTO_COVID = aumento_covid_temp, INICIO = 1, STEP = step)
 
     print("Calculo mochila conservando todos los servicios")
     parametros["aumento_covid_todos_objetos"] = calculoMochila(CONSUMO_PROMEDIO_MBS,CAP_MAX,AUMENTO_COVID = parametros["aumento_covid"][2]["maximo_aumento_permitido_todos_los_objetos"], INICIO = 1, STEP = 0.01)
@@ -102,13 +110,14 @@ def calculoMochila(CONSUMO_PROMEDIO_MBS_PROV,CAP_MAX_PROV,AUMENTO_COVID, INICIO,
     print ("Consumo de ", CONSUMO_PROMEDIO_MBS_PROV)
     print (f"Capacidad maxima por mes de {CAP_MAX_PROV} GB/mes")
     print()
-    print(INICIO)
-    print(AUMENTO_COVID)
-    print(STEP)
+    print("Inicio", INICIO)
+    print("Aumento COVID",AUMENTO_COVID)
+    print("Step", STEP)
     packed_items = []   
     packed_weights = []
     computed_value = 0
     total_weight = 0
+
     for i in np.arange(INICIO, AUMENTO_COVID, STEP):
     # for i in np.arange(0, AUMENTO_COVID + 0.01, 0.01):
     # for i in np.arange(0, 0.79 + 0.01, 0.01):
@@ -191,17 +200,12 @@ def calculoMochila(CONSUMO_PROMEDIO_MBS_PROV,CAP_MAX_PROV,AUMENTO_COVID, INICIO,
         solver.Init(values, weights, capacities)
         computed_value = solver.Solve()
 
-        if (maximo_funcional <= computed_value) :
-            # print(colored(f"Funcional actual: {computed_value}\n", 'green'), 
-            # colored(f"Funcional máximo : {maximo_funcional}", 'red'))
-            maximo_funcional = computed_value
-            maximo_aumento_permitido = i
+
 
         packed_items = []   
         packed_weights = []
         total_weight = 0
         # print ('AUMENTO_COVID: ', i)
-        print('Total value =', computed_value)
         for j in range(len(values)):
             if solver.BestSolutionContains(j):
                 packed_items.append(services[j])
@@ -209,12 +213,23 @@ def calculoMochila(CONSUMO_PROMEDIO_MBS_PROV,CAP_MAX_PROV,AUMENTO_COVID, INICIO,
                 total_weight += weights[0][j]
 
         if (len(weights[0])) == len(packed_items):
-            maximo_aumento_permitido_todos_los_objetos =  i
+            maximo_aumento_permitido_todos_los_objetos = round(i, 2)
+
+        if (maximo_funcional < computed_value) :
+            print(colored(f"Funcional actual: {computed_value}\n", 'green'), 
+            colored(f"Funcional máximo : {maximo_funcional}", 'red'))
+            maximo_funcional = computed_value
+            print(i)
+            maximo_aumento_permitido = round(i, 2)
+        elif (maximo_funcional == computed_value and len(weights[0])) == len(packed_items):
+            maximo_aumento_permitido = round(i, 2)
+
         # print('Total weight:', total_weight)
         # print('Packed items:', packed_items)
         # print('Packed_weights:', packed_weights)
     print('Maximo aumento trafico internet permitido:', maximo_aumento_permitido)
     print('Maximo aumento trafico conservando todos los servicios:', maximo_aumento_permitido_todos_los_objetos)
+    print('Total value =', computed_value)
     print('Total weight:', total_weight)
     print('Packed items:', packed_items)
     print('Packed_weights:', packed_weights)            
@@ -226,7 +241,7 @@ def calculoMochila(CONSUMO_PROMEDIO_MBS_PROV,CAP_MAX_PROV,AUMENTO_COVID, INICIO,
     parametros["maximo_funcional"] = maximo_funcional
     parametros["total_weight"] = total_weight
     parametros["computed_value"] = computed_value
-
+    
     print(packed_items)
     print(packed_weights)
 

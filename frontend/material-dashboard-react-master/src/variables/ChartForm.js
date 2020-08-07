@@ -54,19 +54,36 @@ const ChartForm = React.forwardRef((props,ref) => {
           data["aumento_covid"][0].splice(key, 0, 0)
         }
 
+        if (data["aumento_covid_varios_objetos"][1].indexOf(value) ==-1){
+          data["aumento_covid_varios_objetos"][0].splice(key, 0, 0)
+        }
+
+
         if (data["aumento_covid_todos_objetos"][1].indexOf(value) ==-1){
           data["aumento_covid_todos_objetos"][0].splice(key, 0, 0)
         }
       })
 
-      result.push(["Mes de consumo normal" + "\nFuncional " + data["normal"][2]["computed_value"] + "\nPeso total " + (data["normal"][2]["total_weight"]* 100 - 100).toFixed(2),...data["normal"][0]])
+      result.push(["Mes de consumo normal" + "\nFuncional " + data["normal"][2]["computed_value"] + "\nPeso total " + (data["normal"][2]["total_weight"]).toFixed(2),...data["normal"][0]])
       var porcentaje = data["aumento_covid_todos_objetos"][2]["maximo_aumento_permitido_todos_los_objetos"] == 0 ? 0  : data["aumento_covid_todos_objetos"][2]["maximo_aumento_permitido_todos_los_objetos"]* 100 - 100
-      var str = "Consumo optimo" +
+      var str = "Consumo optimo - Todos los servicios" +
        "\nFuncional " +
         data["aumento_covid_todos_objetos"][2]["computed_value"].toString() +
-         "\nPeso total " + data["aumento_covid_todos_objetos"][2]["total_weight"].toString() + 
+         "\nPeso total " + data["aumento_covid_todos_objetos"][2]["total_weight"].toFixed(2).toString() + 
          "\nPorcentaje aumento: " + (porcentaje).toFixed(2).toString() + "%" 
-      result.push(["Consumo con aumento de" + "\nFuncional " + data["aumento_covid"][2]["computed_value"].toString() + "\nPeso total " + (data["aumento_covid"][2]["total_weight"]* 100 - 100).toFixed(2).toString(),...data["aumento_covid"][0]])
+
+      result.push(["Consumo con aumento covid" + "\nFuncional " + data["aumento_covid"][2]["computed_value"].toString() + "\nPeso total " + (data["aumento_covid"][2]["total_weight"]).toFixed(2).toString(),...data["aumento_covid"][0]])
+
+      var porcentajeVarios = data["aumento_covid_varios_objetos"][2]["maximo_aumento_permitido"] == 0 ? 0  : data["aumento_covid_varios_objetos"][2]["maximo_aumento_permitido"]* 100 - 100
+
+      var strVarios = "Consumo optimo" +
+       "\nFuncional " +
+        data["aumento_covid_varios_objetos"][2]["computed_value"].toString() +
+         "\nPeso total " + data["aumento_covid_varios_objetos"][2]["total_weight"].toFixed(2).toString() + 
+         "\nPorcentaje aumento: " + (porcentajeVarios).toFixed(2).toString() + "%" 
+
+
+      result.push([strVarios,...data["aumento_covid_varios_objetos"][0]])
       result.push([str,...data["aumento_covid_todos_objetos"][0]])
 
 
