@@ -2,6 +2,9 @@
 // // // Tasks for TasksCard - see Dashboard view
 // #############################
 
+var services = {}
+  
+
 var bugs = [
   'Sign contract for "What are conference organizers afraid of?"',
   "Lines From Great Russian Literature? Or E-mails From My Boss?",
@@ -22,5 +25,6 @@ module.exports = {
   // these 3 are used to create the tasks lists in TasksCard - Dashboard view
   bugs,
   website,
-  server
+  server,
+  services
 };

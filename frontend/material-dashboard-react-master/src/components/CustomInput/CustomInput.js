@@ -20,12 +20,14 @@ export default function CustomInput(props) {
     formControlProps,
     labelText,
     id,
+    disabled,
+    value,
     labelProps,
     inputProps,
     error,
     success
   } = props;
-
+  console.log("Input", value);
   const labelClasses = classNames({
     [" " + classes.labelRootError]: error,
     [" " + classes.labelRootSuccess]: success && !error
@@ -58,6 +60,8 @@ export default function CustomInput(props) {
           disabled: classes.disabled,
           underline: underlineClasses
         }}
+        defaultValue={value}
+        disabled={disabled}
         id={id}
         {...inputProps}
       />

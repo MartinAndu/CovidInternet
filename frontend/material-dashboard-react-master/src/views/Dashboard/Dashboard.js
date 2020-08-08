@@ -43,7 +43,7 @@ import CardFooter from "components/Card/CardFooter.js";
 import ReactFileReader from 'react-file-reader'
 import ChartForm from "variables/ChartForm"
 
-import { bugs, website, server } from "variables/general.js";
+import { bugs, website, server, services } from "variables/general.js";
 // import {MDCIconButtonToggle} from '@material/icon-button';
 
 import {
@@ -55,6 +55,12 @@ import {
 import styles from "assets/jss/material-dashboard-react/views/dashboardStyle.js";
 
 const useStyles = makeStyles(styles);
+
+services["weights"] = []
+services["values"] = []
+services["names"] = []
+var indices = []
+
 /*
   const useStyles = makeStyles((theme) => ({
     root: {
@@ -131,12 +137,22 @@ const Dashboard = props =>  {
     let columna = (data[0]).slice()
     let datos = data.slice(1)
 
+    services["weights"] = [];
+    services["values"] = [];
+    services["names"] = [];
     datos.map( (value, key) => {
       var service = value[columna.indexOf("service")];
-      param["services"].push(service)
-      param["weights"][service] = value[columna.indexOf("weight")]
-      param["values"][service] = value[columna.indexOf("values")]
+      param["services"].push(service);
+      let weight = value[columna.indexOf("weight")];
+      let val = value[columna.indexOf("values")];
+      services["weights"].push(weight);
+      services["values"].push(val);
+      services["names"].push(service);
+      param["weights"][service] = (weight / 100) + "";
+      param["values"][service] = val;
+      indices.push(key)
     })
+
 
     param["parameters"]["avg_mbps_monthly"] = data[1][columna.indexOf("avg_mbps_monthly")]
     param["parameters"]["avg_use"] = data[1][columna.indexOf("avg_use")]
@@ -212,6 +228,7 @@ const Dashboard = props =>  {
         .then(
           (result) => {
             console.log(result);  
+            setOpen(true);
             document.location.href = "/admin/table"
           },
           // Nota: es importante manejar errores aquí y no en 
@@ -270,9 +287,9 @@ const Dashboard = props =>  {
   return (
     <div>
        <div className={classes.root}>
-         <Button variant="outlined" onClick={handleClick}>
+         {/*<Button variant="outlined" onClick={handleClick}>
            Open success snackbar
-         </Button>
+         </Button>*/}
          <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
            <Alert onClose={handleClose} severity="success">
              Se ha guardado con éxito!
@@ -349,6 +366,27 @@ const Dashboard = props =>  {
                </div>
              </CardFooter>
            </Card>
+         </GridItem>
+       </GridContainer>
+       <GridContainer>
+         <GridItem xs={12} sm={12} md={6}>
+           <CustomTabs
+             title=""
+             headerColor="primary"
+             tabs={[
+               {
+                 tabName: "Servicios",
+                 tabIcon: Cloud,
+                 tabContent: (
+                   <Tasks
+                     checkedIndexes={[0, 3]}
+                     tasksIndexes={indices}
+                     tasks={{...services}}
+                   />
+                 )
+               }
+             ]}
+           />
          </GridItem>
        </GridContainer>
        <GridContainer>

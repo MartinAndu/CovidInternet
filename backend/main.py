@@ -48,23 +48,24 @@ def main(parameters):
     #     print (csvGlobals.provinces[p])
     #     consumoPorProvincia(p, csvGlobals.provinces[p])
         
-    print("Calculo mochila normal")
+    step = 0.0001
+    print(colored(f"Calculo mochila normal", 'blue'))
     parametros = dict()
     parametros["normal"] = calculoMochila(CONSUMO_PROMEDIO_MBS,CAP_MAX,AUMENTO_COVID = 1.1, INICIO = 1, STEP = 1)
 
-    print("Calculo mochila con aumento covid")
-    parametros["aumento_covid"] = calculoMochila(CONSUMO_PROMEDIO_MBS,CAP_MAX,AUMENTO_COVID = 1 + 0.01*AUMENTO_COVID, INICIO = 1, STEP = 0.01)
+    print(colored(f"Calculo mochila con aumento covid", 'blue'))
+    parametros["aumento_covid"] = calculoMochila(CONSUMO_PROMEDIO_MBS,CAP_MAX,AUMENTO_COVID = 1 + 0.01*AUMENTO_COVID, INICIO = 1, STEP = step)
 
-    print("Calculo mochila aumento mas optimo")
-    step = 0.01 
+    print(colored(f"Calculo mochila aumento mas optimo", 'blue'))
+    step_aumento = step 
     aumento_covid_temp = parametros["aumento_covid"][2]["maximo_aumento_permitido"]
     if (aumento_covid_temp == 1):
-        step = 1
+        step_aumento = 1
         aumento_covid_temp = 1.1
-    parametros["aumento_covid_varios_objetos"] = calculoMochila(CONSUMO_PROMEDIO_MBS,CAP_MAX,AUMENTO_COVID = aumento_covid_temp, INICIO = 1, STEP = step)
+    parametros["aumento_covid_varios_objetos"] = calculoMochila(CONSUMO_PROMEDIO_MBS,CAP_MAX,AUMENTO_COVID = aumento_covid_temp, INICIO = 1, STEP = step_aumento)
 
-    print("Calculo mochila conservando todos los servicios")
-    parametros["aumento_covid_todos_objetos"] = calculoMochila(CONSUMO_PROMEDIO_MBS,CAP_MAX,AUMENTO_COVID = parametros["aumento_covid"][2]["maximo_aumento_permitido_todos_los_objetos"], INICIO = 1, STEP = 0.01)
+    print(colored(f"Calculo mochila conservando todos los servicios", 'blue'))
+    parametros["aumento_covid_todos_objetos"] = calculoMochila(CONSUMO_PROMEDIO_MBS,CAP_MAX,AUMENTO_COVID = parametros["aumento_covid"][2]["maximo_aumento_permitido_todos_los_objetos"], INICIO = 1, STEP = step)
 
     # print()
     # print(parametros["normal"])
@@ -213,16 +214,16 @@ def calculoMochila(CONSUMO_PROMEDIO_MBS_PROV,CAP_MAX_PROV,AUMENTO_COVID, INICIO,
                 total_weight += weights[0][j]
 
         if (len(weights[0])) == len(packed_items):
-            maximo_aumento_permitido_todos_los_objetos = round(i, 2)
+            maximo_aumento_permitido_todos_los_objetos = round(i, 4)
 
         if (maximo_funcional < computed_value) :
             print(colored(f"Funcional actual: {computed_value}\n", 'green'), 
             colored(f"Funcional máximo : {maximo_funcional}", 'red'))
             maximo_funcional = computed_value
             print(i)
-            maximo_aumento_permitido = round(i, 2)
+            maximo_aumento_permitido = round(i, 4)
         elif (maximo_funcional == computed_value and len(weights[0])) == len(packed_items):
-            maximo_aumento_permitido = round(i, 2)
+            maximo_aumento_permitido = round(i, 4)
 
         # print('Total weight:', total_weight)
         # print('Packed items:', packed_items)
