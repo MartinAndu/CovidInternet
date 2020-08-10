@@ -72,8 +72,8 @@ const ChartForm = React.forwardRef((props,ref) => {
          "\nPeso total " + data["aumento_covid_todos_objetos"][2]["total_weight"].toFixed(2).toString() + 
          "\nPorcentaje aumento: " + (porcentaje).toFixed(2).toString() + "%" 
 
-      result.push(["Consumo con aumento covid" + "\nFuncional " + data["aumento_covid"][2]["computed_value"].toString() + "\nPeso total " + (data["aumento_covid"][2]["total_weight"]).toFixed(2).toString(),...data["aumento_covid"][0]])
-
+      result.push(["Consumo con aumento covid" + "\nFuncional " + data["aumento_covid"][2]["computed_value"].toString() + "\nPeso total " + (data["aumento_covid"][2]["total_weight"]).toFixed(2).toString() +  "\nPorcentaje aumento: " + data["parameters"]["increase_covid"] + "%" 
+,...data["aumento_covid"][0]])
       var porcentajeVarios = data["aumento_covid_varios_objetos"][2]["maximo_aumento_permitido"] == 0 ? 0  : data["aumento_covid_varios_objetos"][2]["maximo_aumento_permitido"]* 100 - 100
 
       var strVarios = "Consumo optimo" +

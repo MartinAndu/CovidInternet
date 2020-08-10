@@ -27,7 +27,6 @@ export default function CustomInput(props) {
     error,
     success
   } = props;
-  console.log("Input", value);
   const labelClasses = classNames({
     [" " + classes.labelRootError]: error,
     [" " + classes.labelRootSuccess]: success && !error
@@ -40,6 +39,7 @@ export default function CustomInput(props) {
   const marginTop = classNames({
     [classes.marginTop]: labelText === undefined
   });
+  console.log(value);
   return (
     <FormControl
       {...formControlProps}
@@ -60,7 +60,7 @@ export default function CustomInput(props) {
           disabled: classes.disabled,
           underline: underlineClasses
         }}
-        defaultValue={value}
+        value={value}
         disabled={disabled}
         id={id}
         {...inputProps}

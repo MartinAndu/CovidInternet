@@ -1,4 +1,4 @@
-import React from "react";
+import  React , { useState, useEffect} from "react";
 import PropTypes from "prop-types";
 import classnames from "classnames";
 // @material-ui/core components
@@ -27,9 +27,15 @@ var divStyle={
   paddingTop: "50px" 
 }
 
-export default function Tasks(props) {
+
+const Tasks = props =>  {
   const classes = useStyles();
   const [checked, setChecked] = React.useState([...props.checkedIndexes]);
+  const [flagTasks, setFlagTasks] = useState(true)
+
+  const [, updateState] = React.useState();
+  const forceUpdate = React.useCallback(() => updateState({}), []);
+
   const handleToggle = value => {
     const currentIndex = checked.indexOf(value);
     const newChecked = [...checked];
@@ -46,12 +52,14 @@ export default function Tasks(props) {
     [classes.tableCellRTL]: rtlActive
   });
   // {inputProps={tasks["services"]["weights"][value]}}
-  var inputProps = {}
+  var inputProps = {};
+  var indices = tasksIndexes.slice();
   inputProps["weights"] = [];
   inputProps["names"] = [];
   inputProps["values"] = [];
+
   tasks["weights"].map( (value, key) => {
-    inputProps["weights"].push(value)
+    inputProps["weights"].push(value + "%")
   })
 
 
@@ -68,25 +76,25 @@ export default function Tasks(props) {
   return (
     <Table className={classes.table}>
       <TableBody>
-        {tasksIndexes.map(value => (
+        {indices.map(value => (
             <TableRow key={value} className={classes.tableRow}>
               <TableCell className={tableCellClasses}>
               </TableCell>
               <TableCell className={tableCellClasses}>
               <GridContainer>
-                <GridItem xs={12} sm={12} md={12}>
+                <GridItem xs={8} sm={4} md={5}>
                  <CustomInput
                   labelText="Nombre"
                   value= {inputProps["names"][value]}
                   disabled= {true}
                   id="postal-code"
                   formControlProps={{
-                    fullWidth: false
+                    fullWidth: true
                   }}
                 />
                 </GridItem>
 
-                <GridItem xs={12} sm={12} md={4}>
+                <GridItem xs={4} sm={4} md={5}>
                  <CustomInput
                   labelText="Porcentaje(peso)"
                   value= {inputProps["weights"][value]}
@@ -97,7 +105,7 @@ export default function Tasks(props) {
                   }}
                 />
                 </GridItem>
-                <GridItem xs={12} sm={12} md={4}>
+                <GridItem xs={4} sm={4} md={2}>
                  <CustomInput
                   labelText="Valor"
                   value= {inputProps["values"][value]}
@@ -159,10 +167,12 @@ export default function Tasks(props) {
     </Table>
   );
 }
-
 Tasks.propTypes = {
   tasksIndexes: PropTypes.arrayOf(PropTypes.number),
   tasks: PropTypes.object,
   rtlActive: PropTypes.bool,
   checkedIndexes: PropTypes.array
 };
+
+
+export default Tasks

@@ -25,6 +25,7 @@ import Button from "components/CustomButtons/Button.js";
 import Accessibility from "@material-ui/icons/Accessibility";
 import BugReport from "@material-ui/icons/BugReport";
 import Code from "@material-ui/icons/Code";
+import Loader from 'react-loader-spinner'
 import Cloud from "@material-ui/icons/Cloud";
 // core components
 import GridItem from "components/Grid/GridItem.js";
@@ -43,7 +44,7 @@ import CardFooter from "components/Card/CardFooter.js";
 import ReactFileReader from 'react-file-reader'
 import ChartForm from "variables/ChartForm"
 
-import { bugs, website, server, services } from "variables/general.js";
+import { bugs, website, server} from "variables/general.js";
 // import {MDCIconButtonToggle} from '@material/icon-button';
 
 import {
@@ -56,6 +57,7 @@ import styles from "assets/jss/material-dashboard-react/views/dashboardStyle.js"
 
 const useStyles = makeStyles(styles);
 
+var services = {}
 services["weights"] = []
 services["values"] = []
 services["names"] = []
@@ -81,9 +83,26 @@ const Dashboard = props =>  {
   const classes = useStyles();
   const parametros = {}
   const [realClasses, setClasses] = useState(parametros);
+  const [loader, setLoader] = useState("hidden")
+  const [timeout, setTimeout] = useState(0)
+  const [messageWarning, setMessageWarning] = useState(null)
+  const [messageSuccess, setMessageSuccess] = useState(null)
+
+
+  const [flagTasks, setFlagTasks] = useState(false)
+  const [servicesTasks, setServicesTasks] = useState({
+    "weights" : [],
+    "values" : [],
+    "names" : []
+  })
+  const [indicesTasks, setIndicesTasks] = useState([])
+
+
 
   const [jsonData, setJsonData] = useState(null);
   const [open, setOpen] = useState(false);
+  const [openWarning, setOpenWarning] = useState(null)
+  const [openSuccess, setOpenSuccess] = useState(null)
 
   const childChartForm = useRef(0);
   const [error, setError] = useState(null);
@@ -103,6 +122,22 @@ const Dashboard = props =>  {
 
 
 
+  const getServicesData = data => {
+    data["services"].map( (value, key) => {
+      services["names"].push(value);
+      indices.push(key)      
+    })
+
+    for (var [key, value] of Object.entries(data["weights"])){ 
+      services["weights"].push(value);
+    }
+
+    for (var [key, value] of Object.entries(data["values"])){ 
+      services["values"].push(value);
+    }
+
+  }
+
 
   useEffect(() => {
       console.log("useEffect")
@@ -113,6 +148,7 @@ const Dashboard = props =>  {
         .then(res => res.json())
         .then(
           (result) => {
+            getServicesData(result)
             getData(result)
           },
           // Nota: es importante manejar errores aquí y no en 
@@ -129,6 +165,7 @@ const Dashboard = props =>  {
 
   const formatJson = data => {
     let param = {}
+    indices = []
     param["services"] = []
     param["weights"] = {}
     param["values"] = {}
@@ -140,6 +177,13 @@ const Dashboard = props =>  {
     services["weights"] = [];
     services["values"] = [];
     services["names"] = [];
+
+    var sumaPorcentajes = 0;
+
+    var sumaDecimal = (a,b) => {
+     return +(a+b).toFixed(2)
+    }
+
     datos.map( (value, key) => {
       var service = value[columna.indexOf("service")];
       param["services"].push(service);
@@ -148,16 +192,60 @@ const Dashboard = props =>  {
       services["weights"].push(weight);
       services["values"].push(val);
       services["names"].push(service);
-      param["weights"][service] = (weight / 100) + "";
+      if (+weight < 0 || isNaN(weight)) {
+        setMessageWarning("Pesos deben ser mayor o igual a 0");
+        param.error = true
+        return param  
+      }
+      if (+val < 0 || isNaN(val)) {
+        setMessageWarning("Valores deben ser mayor o igual a 0");
+        param.error = true
+        return param  
+      }
+
+      param["weights"][service] = (weight) + "";
       param["values"][service] = val;
+      sumaPorcentajes = sumaDecimal(sumaPorcentajes,+weight)    
       indices.push(key)
     })
-
 
     param["parameters"]["avg_mbps_monthly"] = data[1][columna.indexOf("avg_mbps_monthly")]
     param["parameters"]["avg_use"] = data[1][columna.indexOf("avg_use")]
     param["parameters"]["max_cap_tb"] = data[1][columna.indexOf("max_cap_tb")]
     param["parameters"]["increase_covid"] = data[1][columna.indexOf("increase_covid")]
+
+    if (+param["parameters"]["avg_mbps_monthly"] <= 0 || isNaN(param["parameters"]["avg_mbps_monthly"]) ) {
+      setMessageWarning("Uso promedio de Mbp/s debe ser mayor a 0");
+      param.error = true
+      return param  
+    }
+
+    if (+param["parameters"]["avg_use"] <= 0 ||  isNaN(param["parameters"]["avg_use"])) {
+      setMessageWarning("Cantidad de horas de uso debe ser mayor a 0");
+      param.error = true
+      return param  
+    }
+
+    if (+param["parameters"]["max_cap_tb"] <= 0 ||  isNaN(param["parameters"]["max_cap_tb"])) {
+      setMessageWarning("Capacidad máxima debe ser mayor a 0");
+      param.error = true
+      return param  
+    }
+
+    if (+param["parameters"]["increase_covid"] <= 0 ||  isNaN(param["parameters"]["increase_covid"])) {
+      setMessageWarning("Incremento de covid debe ser mayor a 0");
+      param.error = true
+      return param  
+    }
+
+    if (sumaPorcentajes != 100) {
+      setMessageWarning("Porcentaje debe sumar 100%");
+      param.error = true
+      return param
+    }
+
+
+
 
     return param
   }
@@ -166,9 +254,13 @@ const Dashboard = props =>  {
       var reader = new FileReader();
       reader.onload = function(e) {
 
-        csv.parse(reader.result, (err, data) => {
-            
+        csv.parse(reader.result, (err, data) => { 
           let param = formatJson(data)
+          if (param.error) {
+            setOpenWarning(true);
+            return null;
+          }
+          services.cambio = true;
           getData(param)
 
          });
@@ -178,6 +270,9 @@ const Dashboard = props =>  {
 
   const getData = param => {
 
+    setServicesTasks(services);
+    setIndicesTasks(indices);
+    setFlagTasks(true);
     let jsonData = JSON.stringify(param)
      const requestOptions = {
       method : 'Post',
@@ -194,6 +289,9 @@ const Dashboard = props =>  {
 
     setJsonData(jsonData)
     setClasses(parametros)
+    setLoader("visible");
+
+    document.getElementsByClassName('loader-div')[0].scrollIntoView({block: "end"});
     fetch("/getJson", requestOptions)
       .then(res => res.json())
       .then(
@@ -204,6 +302,10 @@ const Dashboard = props =>  {
 
           console.log(result)
           setItems(result.items);
+          setTimeout(1);
+          setLoader("hidden");          
+          setMessageSuccess("Se han cargado los datos con éxito!");
+          setOpenSuccess(true);
         },
         // Nota: es importante manejar errores aquí y no en 
         // un bloque catch() para que no interceptemos errores
@@ -251,6 +353,8 @@ const Dashboard = props =>  {
     }
 
     setOpen(false);
+    setOpenWarning(false);
+    setOpenSuccess(false);
   };
 
 
@@ -266,22 +370,6 @@ const Dashboard = props =>  {
       return <TableList/>;
   }
 */  
-  /*
-  <div>
-     <div className={classes.root}>
-       <Button variant="outlined" onClick={handleClick}>
-         Open success snackbar
-       </Button>
-       <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
-         <Alert onClose={handleClose} severity="success">
-           This is a success message!
-         </Alert>
-       </Snackbar>
-       <Alert severity="error">This is an error message!</Alert>
-       <Alert severity="warning">This is a warning message!</Alert>
-       <Alert severity="info">This is an information message!</Alert>
-       <Alert severity="success">This is a success message!</Alert>
-     </div>*/
 
 
   return (
@@ -293,6 +381,16 @@ const Dashboard = props =>  {
          <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
            <Alert onClose={handleClose} severity="success">
              Se ha guardado con éxito!
+           </Alert>
+         </Snackbar>
+         <Snackbar open={openSuccess} autoHideDuration={2000} onClose={handleClose}>
+           <Alert onClose={handleClose} severity="success">
+             {messageSuccess}
+           </Alert>
+         </Snackbar>
+         <Snackbar open={openWarning} autoHideDuration={4000} onClose={handleClose}>
+           <Alert onClose={handleClose} severity="warning">
+             {messageWarning}
            </Alert>
          </Snackbar>
        </div>
@@ -368,7 +466,9 @@ const Dashboard = props =>  {
            </Card>
          </GridItem>
        </GridContainer>
+
        <GridContainer>
+
          <GridItem xs={12} sm={12} md={6}>
            <CustomTabs
              title=""
@@ -379,14 +479,16 @@ const Dashboard = props =>  {
                  tabIcon: Cloud,
                  tabContent: (
                    <Tasks
+                     flagTasks = {flagTasks}
                      checkedIndexes={[0, 3]}
-                     tasksIndexes={indices}
-                     tasks={{...services}}
+                     tasksIndexes={indicesTasks}
+                     tasks={{...servicesTasks}}
                    />
                  )
                }
              ]}
            />
+ 
          </GridItem>
        </GridContainer>
        <GridContainer>
@@ -410,9 +512,17 @@ const Dashboard = props =>  {
                 <span className="mdc-button__label">Guardar</span>
                 <div className="mdc-button__touch"></div>
               </Button>  
-            </div>   
+            </div>
           </GridItem >
-
+          <div className="loader-div" style={{ visibility: loader, zIndex: 1 }}>   
+            <Loader 
+            type="ThreeDots"
+            color="#00BFFF"
+            height={100}
+            width={100}    
+            timeout={0}      
+            />
+          </div>
          </form>
        </GridContainer>
      </div>

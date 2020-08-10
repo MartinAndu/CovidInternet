@@ -51,21 +51,22 @@ def main(parameters):
     step = 0.0001
     print(colored(f"Calculo mochila normal", 'blue'))
     parametros = dict()
-    parametros["normal"] = calculoMochila(CONSUMO_PROMEDIO_MBS,CAP_MAX,AUMENTO_COVID = 1.1, INICIO = 1, STEP = 1)
+    parametros["normal"] = calculoMochila(CONSUMO_PROMEDIO_MBS,CAP_MAX,AUMENTO_COVID = 1, INICIO = 1, STEP = 1)
 
     print(colored(f"Calculo mochila con aumento covid", 'blue'))
     parametros["aumento_covid"] = calculoMochila(CONSUMO_PROMEDIO_MBS,CAP_MAX,AUMENTO_COVID = 1 + 0.01*AUMENTO_COVID, INICIO = 1, STEP = step)
 
     print(colored(f"Calculo mochila aumento mas optimo", 'blue'))
     step_aumento = step 
-    aumento_covid_temp = parametros["aumento_covid"][2]["maximo_aumento_permitido"]
+    aumento_covid_temp = parametros["aumento_covid"][2]["maximo_aumento_permitido"] 
+    print("aumento temp", aumento_covid_temp)
     if (aumento_covid_temp == 1):
         step_aumento = 1
-        aumento_covid_temp = 1.1
+        aumento_covid_temp = 1
     parametros["aumento_covid_varios_objetos"] = calculoMochila(CONSUMO_PROMEDIO_MBS,CAP_MAX,AUMENTO_COVID = aumento_covid_temp, INICIO = 1, STEP = step_aumento)
 
     print(colored(f"Calculo mochila conservando todos los servicios", 'blue'))
-    parametros["aumento_covid_todos_objetos"] = calculoMochila(CONSUMO_PROMEDIO_MBS,CAP_MAX,AUMENTO_COVID = parametros["aumento_covid"][2]["maximo_aumento_permitido_todos_los_objetos"], INICIO = 1, STEP = step)
+    parametros["aumento_covid_todos_objetos"] = calculoMochila(CONSUMO_PROMEDIO_MBS,CAP_MAX,AUMENTO_COVID = parametros["aumento_covid"][2]["maximo_aumento_permitido_todos_los_objetos"] , INICIO = 1, STEP = step)
 
     # print()
     # print(parametros["normal"])
@@ -96,7 +97,7 @@ def convertToVector(dict):
 
 
 def calculoMochila(CONSUMO_PROMEDIO_MBS_PROV,CAP_MAX_PROV,AUMENTO_COVID, INICIO, STEP):
-    maximo_funcional = -1
+    maximo_funcional = 0
     maximo_aumento_permitido = 0
     maximo_aumento_permitido_todos_los_objetos = 0
 
@@ -109,7 +110,7 @@ def calculoMochila(CONSUMO_PROMEDIO_MBS_PROV,CAP_MAX_PROV,AUMENTO_COVID, INICIO,
     
     print()
     print ("Consumo de ", CONSUMO_PROMEDIO_MBS_PROV)
-    print (f"Capacidad maxima por mes de {CAP_MAX_PROV} GB/mes")
+    print (f"Capacidad maxima por mes de {CAP_MAX_PROV} Mb/mes")
     print()
     print("Inicio", INICIO)
     print("Aumento COVID",AUMENTO_COVID)
@@ -119,7 +120,9 @@ def calculoMochila(CONSUMO_PROMEDIO_MBS_PROV,CAP_MAX_PROV,AUMENTO_COVID, INICIO,
     computed_value = 0
     total_weight = 0
 
-    for i in np.arange(INICIO, AUMENTO_COVID, STEP):
+    mini_step = 0.00001
+
+    for i in np.arange(INICIO, AUMENTO_COVID + mini_step, STEP):
     # for i in np.arange(0, AUMENTO_COVID + 0.01, 0.01):
     # for i in np.arange(0, 0.79 + 0.01, 0.01):
         # print ('Rango -->', i)
@@ -185,7 +188,7 @@ def calculoMochila(CONSUMO_PROMEDIO_MBS_PROV,CAP_MAX_PROV,AUMENTO_COVID, INICIO,
         weights = [[]]
         values = []
         for l in lst:
-            weights[0].append(l * CONSUMO_MES_TOTAL)
+            weights[0].append((l/100) * CONSUMO_MES_TOTAL)
             # values.append(l * CONSUMO_MES_TOTAL)
 
         for value in csvGlobals.values:
@@ -216,14 +219,13 @@ def calculoMochila(CONSUMO_PROMEDIO_MBS_PROV,CAP_MAX_PROV,AUMENTO_COVID, INICIO,
         if (len(weights[0])) == len(packed_items):
             maximo_aumento_permitido_todos_los_objetos = round(i, 4)
 
-        if (maximo_funcional < computed_value) :
-            print(colored(f"Funcional actual: {computed_value}\n", 'green'), 
-            colored(f"Funcional máximo : {maximo_funcional}", 'red'))
+        if (maximo_funcional <= computed_value) :
+            # print(colored(f"Funcional actual: {computed_value}\n", 'green'), 
+            # colored(f"Funcional máximo : {maximo_funcional}", 'red'))
             maximo_funcional = computed_value
-            print(i)
             maximo_aumento_permitido = round(i, 4)
-        elif (maximo_funcional == computed_value and len(weights[0])) == len(packed_items):
-            maximo_aumento_permitido = round(i, 4)
+        # elif (maximo_funcional == computed_value and len(weights[0])) == len(packed_items):
+        #     maximo_aumento_permitido = round(i, 4)
 
         # print('Total weight:', total_weight)
         # print('Packed items:', packed_items)
