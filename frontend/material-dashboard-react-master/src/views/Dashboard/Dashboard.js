@@ -109,6 +109,8 @@ const Dashboard = props =>  {
   const [isLoaded, setIsLoaded] = useState(false);
   const [items, setItems] = useState([]);
   const [visibilityState, setVisibility] = useState("visible");
+  const [visibilitySave, setVisibilitySave] = useState(false);
+
   // const [backTable, setBackTable] = useState(null)
   
   const initialFormState = { id : null, name: '', username: ''}
@@ -290,7 +292,7 @@ const Dashboard = props =>  {
     setJsonData(jsonData)
     setClasses(parametros)
     setLoader("visible");
-
+    setVisibilitySave(false);
     document.getElementsByClassName('loader-div')[0].scrollIntoView({block: "end"});
     fetch("/getJson", requestOptions)
       .then(res => res.json())
@@ -306,6 +308,7 @@ const Dashboard = props =>  {
           setLoader("hidden");          
           setMessageSuccess("Se han cargado los datos con éxito!");
           setOpenSuccess(true);
+          setVisibilitySave(true);
         },
         // Nota: es importante manejar errores aquí y no en 
         // un bloque catch() para que no interceptemos errores
@@ -507,7 +510,7 @@ const Dashboard = props =>  {
                     <div className="mdc-button__touch"></div>
                   </Button>
               </ReactFileReader>
-              <Button data-style className={jsonData} onClick={saveFiles} type="button"  style={{visibility: visibilityState}}>
+              <Button data-style className={jsonData} onClick={saveFiles} type="button"  style={{visibility: (visibilityState != "hidden" && visibilitySave) ? "visible" : "hidden"}}>
                 <div className="mdc-button__ripple"></div>
                 <span className="mdc-button__label">Guardar</span>
                 <div className="mdc-button__touch"></div>
