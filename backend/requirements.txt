@@ -6,7 +6,7 @@ idna==2.9
 itsdangerous==1.1.0
 Jinja2==2.11.2
 MarkupSafe==1.1.1
-numpy==1.18.3
+numpy==1.22.0
 ortools==6.7.4973
 pandas==1.0.3
 protobuf==3.11.3
